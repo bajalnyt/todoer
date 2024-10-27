@@ -1,34 +1,53 @@
 package main
 
 import (
-	"embed"
+	"context"
+	"fmt"
 	"net/http"
-
-	"github.com/bajalnyt/todoer/views/components"
+	"os"
+	"time"
 
 	"github.com/a-h/templ"
-	"github.com/labstack/echo/v4"
+	"github.com/bajalnyt/todoer/views/components"
 )
 
-//go:embed static/**
-var staticFS embed.FS
-
 func main() {
-	e := echo.New()
+	mux := http.NewServeMux()
 
-	e.Static("/", "static")
-
-	e.GET("/", func(c echo.Context) error {
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		buf := templ.GetBuffer()
 		defer templ.ReleaseBuffer(buf)
 
 		accordion := components.AccordionExample()
-		if err := accordion.Render(c.Request().Context(), buf); err != nil {
-			return err
+		err := accordion.Render(context.Background(), buf)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
-
-		return c.HTML(http.StatusOK, buf.String())
+		fmt.Fprintln(w, buf.String())
 	})
 
-	e.Start(":8080")
+	mux.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, World!")
+	})
+
+	mux.Handle("GET /*",
+		http.FileServer(
+			http.Dir("./static"),
+		),
+	)
+
+	srv := &http.Server{
+		Addr:         fmt.Sprintf("localhost:%d", 8080),
+		Handler:      mux,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	err := srv.ListenAndServe()
+	if err != nil {
+		fmt.Println(err)
+	}
+	os.Exit(1)
 }
