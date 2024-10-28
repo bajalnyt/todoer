@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,6 +11,9 @@ import (
 	"github.com/a-h/templ"
 	"github.com/bajalnyt/todoer/views/components"
 )
+
+//go:embed static/**
+var staticFS embed.FS
 
 func main() {
 	mux := http.NewServeMux()
@@ -31,9 +35,11 @@ func main() {
 		fmt.Fprintln(w, "Hello, World!")
 	})
 
-	mux.Handle("GET /*",
-		http.FileServer(
-			http.Dir("./static"),
+	mux.Handle("GET /static/*",
+		http.StripPrefix("/static/",
+			http.FileServer(
+				http.Dir("./static"),
+			),
 		),
 	)
 
