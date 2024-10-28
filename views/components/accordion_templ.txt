@@ -1,7 +1,0 @@
-<div class=\"collapse collapse-arrow bg-base-200\"><input type=\"checkbox\" name=\"templ-accordion\"><div class=\"collapse-title text-xl font-medium\">
-</div><div class=\"collapse-content\">
-</div></div>
-<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link rel=\"stylesheet\" type=\"text/css\" href=\"/css/tw.css\"><title>Document</title></head><body class=\"w-full h-full min-h-svh\"><main><div>
-<p>This is the first content</p>
-<p>This is the second content</p>
-</div></main></body></html>
